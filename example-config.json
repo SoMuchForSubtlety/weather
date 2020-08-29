@@ -1,0 +1,7 @@
+{
+  "auth_token": "xyz",
+  "address": "wss://chat.test.com",
+  "weather_api_key": "xyz",
+  "geo_api_key": "xyz",
+  "nick": "rain"
+}

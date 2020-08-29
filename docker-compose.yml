@@ -1,0 +1,9 @@
+version: "3.2"
+
+services:
+  weather:
+    container_name: weather
+    image: weather
+    restart: always
+    volumes:
+      - ./config/:/config/
