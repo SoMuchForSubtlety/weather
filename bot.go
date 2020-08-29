@@ -164,17 +164,20 @@ func newBot(config *config) *bot {
 }
 
 func (b *bot) answer(message dggchat.Message, private bool) {
-	sub := time.Since(b.lastMsgTime)
-	if sub < time.Second*10 {
-		log.Printf("throttled, last request %s ago", sub.String())
-		return
-	}
-	b.lastMsgTime = time.Now()
-	last, ok := b.userRequests[message.Sender.Nick]
-	sub = time.Since(last)
-	if ok && sub < time.Minute && strings.ToLower(message.Sender.Nick) != "somuchforsubtlety" {
-		log.Printf("user %s throttled, last request %s ago", message.Sender.Nick, sub.String())
-		return
+	if !private {
+		sub := time.Since(b.lastMsgTime)
+		if sub < time.Second*10 {
+			log.Printf("throttled, last request %s ago", sub.String())
+			return
+		}
+		last, ok := b.userRequests[message.Sender.Nick]
+		sub = time.Since(last)
+		if ok && sub < time.Minute && strings.ToLower(message.Sender.Nick) != "somuchforsubtlety" {
+			log.Printf("user %s throttled, last request %s ago", message.Sender.Nick, sub.String())
+			return
+		}
+
+		b.lastMsgTime = time.Now()
 	}
 	b.userRequests[message.Sender.Nick] = time.Now()
 	prvt := "public"

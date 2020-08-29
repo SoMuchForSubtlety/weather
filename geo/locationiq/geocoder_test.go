@@ -8,7 +8,7 @@ import (
 )
 
 func TestGeocodeYieldsResult(t *testing.T) {
-	ts := testServer(responseForGeocode)
+	ts := testServer(t, responseForGeocode)
 	defer ts.Close()
 
 	gc := Geocoder("foobar", 18, ts.URL+"/")
@@ -31,7 +31,7 @@ func TestGeocodeYieldsResult(t *testing.T) {
 }
 
 func TestGeocodeYieldsNoResult(t *testing.T) {
-	ts := testServer("[]")
+	ts := testServer(t, "[]")
 	defer ts.Close()
 
 	gc := Geocoder("foobar", 18, ts.URL+"/")
@@ -47,7 +47,7 @@ func TestGeocodeYieldsNoResult(t *testing.T) {
 }
 
 func TestReverseGeocodeYieldsResult(t *testing.T) {
-	ts := testServer(responseForReverse)
+	ts := testServer(t, responseForReverse)
 	defer ts.Close()
 
 	gc := Geocoder("foobar", 18, ts.URL+"/")
@@ -62,7 +62,7 @@ func TestReverseGeocodeYieldsResult(t *testing.T) {
 }
 
 func TestReverseGeocodeYieldsNoResult(t *testing.T) {
-	ts := testServer(errorResponse)
+	ts := testServer(t, errorResponse)
 	defer ts.Close()
 
 	gc := Geocoder("foobar", 18, ts.URL+"/")
@@ -76,9 +76,13 @@ func TestReverseGeocodeYieldsNoResult(t *testing.T) {
 	}
 }
 
-func testServer(response string) *httptest.Server {
+func testServer(t *testing.T, response string) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(resp http.ResponseWriter, req *http.Request) {
-		resp.Write([]byte(response))
+		_, err := resp.Write([]byte(response))
+		if err != nil {
+			t.Error(err)
+			t.FailNow()
+		}
 	}))
 }
 
