@@ -166,15 +166,15 @@ func newBot(config *config) *bot {
 func (b *bot) answer(message dggchat.Message, private bool) {
 	if !private {
 		sub := time.Since(b.lastMsgTime)
-		if sub < time.Second*10 {
+		if sub < time.Second*30 {
 			log.Printf("throttled, last request %s ago", sub.String())
-			return
+			private = true
 		}
 		last, ok := b.userRequests[message.Sender.Nick]
 		sub = time.Since(last)
 		if ok && sub < time.Minute && strings.ToLower(message.Sender.Nick) != "somuchforsubtlety" {
 			log.Printf("user %s throttled, last request %s ago", message.Sender.Nick, sub.String())
-			return
+			private = true
 		}
 
 		b.lastMsgTime = time.Now()
@@ -231,7 +231,7 @@ func buildChart(rains []Minutely, locationName string) string {
 		forecast += string(lookupBlock(rain.Precipitation, max))
 	}
 	forecast += "]"
-	forecast += fmt.Sprintf(" %.3f mm of rain over the next hour in %s", total, locationName)
+	forecast += fmt.Sprintf(" %.2f mm of rain over the next hour in %s", total, locationName)
 
 	return forecast
 }
